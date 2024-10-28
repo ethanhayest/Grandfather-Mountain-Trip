@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>My Path to Class</title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.1/dist/leaflet.css" />
+    <link href="https://fonts.googleapis.com/css?family=Noto+Sans" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Lora" rel="stylesheet">
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: whitesmoke;
+            font-family: "Noto Sans", sans-serif;
+            color: #3d3d3d;
+        }
+
+        h1 {
+            position: absolute;
+            margin-top: 0;
+            top: 10px;
+            left: 45px;
+            font-size: 2em;
+            font-family: "Lora", serif;
+            letter-spacing: .04em;
+            padding: 10px 15px;
+            background: rgba(256, 256, 256, 0.9);
+            border: 1px solid grey;
+            border-radius: 3px;
+            z-index: 800;
+        }
+
+        #map {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 100%;
+        }
+
+        #description {
+            position: absolute;
+            bottom: 0;
+            left: 10px;
+            width: 300px;
+            margin: 20px auto;
+            padding: 10px 15px;
+            background: rgba(256, 256, 256, 0.9);
+            border: 1px solid grey;
+            border-radius: 3px;
+            z-index: 800;
+        }
+
+        #toggleImageBtn, #booneImage {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            z-index: 900;
+        }
+
+        #toggleImageBtn {
+            padding: 5px 10px;
+            font-size: 1em;
+            background: rgba(256, 256, 256, 0.9);
+            border: 1px solid grey;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        #booneImage {
+            display: none;
+            width: 300px;
+            border: 1px solid grey;
+            border-radius: 3px;
+        }
+
+        footer {
+            position: absolute;
+            bottom: 0;
+            right: 10px;
+            padding: 5px 10px;
+            font-size: 0.8em;
+            background: rgba(256, 256, 256, 0.9);
+            border: 1px solid grey;
+            border-radius: 3px;
+            z-index: 800;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>My Path to Class</h1>
+
+    <div id="map"></div>
+
+    <div id="description">
+        <h2>About This Route</h2>
+        <p>This map shows the route I often take to class. Sometimes, I take the Applecart bus to Walmart in Boone, NC, and walk to school while passing by landmarks like the Boone Mall and Holmes Convocation Center. I frequently stop by McDonald's for a quick break before continuing on my journey to the Rankin Science Building. It’s a scenic walk that showcases some of Boone's best spots along the way.</p>
+        <p>For more details about Boone, visit <a href="https://www.exploreboone.com/" target="_blank">Explore Boone</a>.</p>
+    </div>
+
+    <button id="toggleImageBtn">Show Image</button>
+    <img id="booneImage" src="/mnt/data/BooneTravelGuide.jpg" alt="Boone Travel Guide">
+
+    <footer>Created by Ethan Tilley</footer>
+
+    <script src="https://unpkg.com/leaflet@1.0.1/dist/leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-gpx/1.5.0/gpx.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-omnivore/0.3.4/leaflet-omnivore.min.js"></script>
+
+    <script>
+        // Initialize map
+        var map = L.map('map').setView([36.19722890235552, -81.6595172443864], 14);
+
+        // Basemap
+        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
+            attribution: 'Tiles &copy; Esri'
+        }).addTo(map);
+
+        // Coordinates for each location
+        var locations = [
+            { name: "Walmart Boone NC", coords: [36.19722890235552, -81.6595172443864] },
+            { name: "Boone Mall NC", coords: [36.202216738424944, -81.66743296960324] },
+            { name: "McDonald's Boone NC", coords: [36.20628338566121, -81.67105333670747] },
+            { name: "Holmes Convocation Center", coords: [36.21128491856465, -81.67596525427578] },
+            { name: "Rankin Science Building", coords: [36.21390083950974, -81.68159295971688] }
+        ];
+
+        // Add markers to the map
+        locations.forEach(function (location) {
+            L.marker(location.coords)
+                .bindPopup("<strong>" + location.name + "</strong>")
+                .addTo(map);
+        });
+
+        // Draw route as a blue line
+        var routeCoords = locations.map(function (location) { return location.coords; });
+        L.polyline(routeCoords, { color: 'blue', weight: 4, opacity: 0.7 }).addTo(map);
+
+        // Load GPX file
+        omnivore.gpx('/mnt/data/mapstogpx20241028_231009.gpx').addTo(map);
+
+        // Load GeoJSON file
+        omnivore.geojson('/mnt/data/map (3).geojson').addTo(map);
+
+        // Toggle image visibility
+        var toggleImageBtn = document.getElementById('toggleImageBtn');
+        var booneImage = document.getElementById('booneImage');
+        toggleImageBtn.addEventListener('click', function () {
+            if (booneImage.style.display === 'none') {
+                booneImage.style.display = 'block';
+                toggleImageBtn.textContent = 'Hide Image';
+            } else {
+                booneImage.style.display = 'none';
+                toggleImageBtn.textContent = 'Show Image';
+            }
+        });
+    </script>
+</body>
+
+</html>
